@@ -884,9 +884,15 @@ def last_game(teamId):
     gameDay2 = (contests["teams"][0]["previousGameSchedule"]["dates"][-1])
     
     if (gameDay1["date"]) == (date.today() - timedelta(days=1)).strftime("%Y-%m-%d"):
-        return gameDay1["games"][0]["gamePk"]
+        if len(gameDay1["games"]) == 1:
+            return gameDay1["games"][0]["gamePk"]
+        else:
+            return gameDay1["games"][-1]["gamePk"]
     elif (gameDay2["date"]) == (date.today() - timedelta(days=1)).strftime("%Y-%m-%d"):
-        return gameDay2["games"][0]["gamePk"]
+        if len(gameDay2["games"]) == 1:
+            return gameDay2["games"][0]["gamePk"]
+        else:
+            return gameDay2["games"][-1]["gamePk"]
 
 
 
