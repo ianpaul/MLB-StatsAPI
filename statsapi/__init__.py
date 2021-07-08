@@ -17,6 +17,8 @@ import copy
 import logging
 import requests
 from datetime import datetime
+from datetime import date
+from datetime import timedelta
 
 from . import version
 from . import endpoints
@@ -869,21 +871,33 @@ def last_game(teamId):
     """Get the gamePk for the given team's most recent game.
     Note: Sometimes Stats API will actually return the next game in the previousSchedule hydration
     """
-    return get(
+    contests = get(
         "team",
         {
             "teamId": teamId,
             "hydrate": "previousSchedule",
             "fields": "teams,id,teamName,previousGameSchedule,dates,date,games,gamePk,season,gameDate,teams,away,home,team,name",
         },
-    )["teams"][0]["previousGameSchedule"]["dates"][0]["games"][0]["gamePk"]
+    )
+
+    gameDay1 = (contests["teams"][0]["previousGameSchedule"]["dates"][-2])
+    gameDay2 = (contests["teams"][0]["previousGameSchedule"]["dates"][-1])
+    
+    if (gameDay1["date"]) == (date.today() - timedelta(days=1)).strftime("%Y-%m-%d"):
+        return gameDay1["games"][0]["gamePk"]
+    elif (gameDay2["date"]) == (date.today() - timedelta(days=1)).strftime("%Y-%m-%d"):
+        return gameDay2["games"][0]["gamePk"]
+
+
+
+
 
 
 def next_game(teamId):
     """Get the gamePk for the given team's next game.
     Note: Sometimes Stats API will actually return the next game in the previousSchedule hydration
     """
-    return get(
+    results: dict = get(
         "team",
         {
             "teamId": teamId,
